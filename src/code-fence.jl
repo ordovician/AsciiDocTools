@@ -1,4 +1,4 @@
-export replace_codeblock
+export replace_codeblocks
 
 """
     replace_codeblocks(path::AbstractString)
@@ -36,7 +36,7 @@ function replace_codeblocks(file::File)
             
             println(out, "[source,julia]\n----")
             lineno += 1
-            s = readuntil(io, "```")
+            s = readuntil(io, "~~~")
             print(out, s)
             lineno += count(==('\n'), s)
             
