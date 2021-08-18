@@ -25,25 +25,26 @@ replace_blurbs(path::AbstractString) = replace_blurbs(Path(path))
 function replace_blurbs(file::File)
     state = FindStart
     lines = readlines(file.path)
-    out = IOBuffer()
-    # parser = Parser(lines, String[], 1)
-    for line in lines
-        if state == FindStart && !startswith(line, "> **")
-            println(out, line)
-        elseif state == FindStart
-            state = FindEnd
-            tag = strip(in("> *"), line)
-            println(out, "[$tag]")
-            println(out, "====")
-        elseif state == FindEnd && !startswith(line, '>')
-            state = FindStart
-            println(out, "====")
-            println(out, line)
-        elseif state == FindEnd
-            printlin(out, lstrip(in("> "), line))
-        else
-            error("$state is not handled")                      
-        end    
+    
+    open(file.path, "w") do out
+        for line in lines
+            if state == FindStart && !startswith(line, "> **")
+                println(out, line)
+            elseif state == FindStart
+                state = FindEnd
+                tag = strip(in("> *"), line)
+                println(out, "[$tag]")
+                println(out, "====")
+            elseif state == FindEnd && !startswith(line, '>')
+                state = FindStart
+                println(out, "====")
+                println(out, line)
+            elseif state == FindEnd
+                println(out, lstrip(in("> "), line))
+            else
+                error("$state is not handled")                      
+            end    
+        end
     end
 end
 

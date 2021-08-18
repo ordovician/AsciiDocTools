@@ -5,7 +5,7 @@ export relace_inlinemath
     relace_inlinemath(file::File)
     relace_inlinemath(dir::Dir)
     
-Replace markdown inline math such as `$x = 10$` with Markua equivalent.
+Replace markdown inline math such as `\$x = 10\$` with Markua equivalent.
 """
 relace_inlinemath(path::AbstractString) = relace_inlinemath(Path(path))
 
@@ -13,7 +13,7 @@ function relace_inlinemath(file::File)
     out = IOBuffer()
     open(file.path) do io
         while !eof(io)
-            s = readuntil(io, "`$")
+            s = readuntil(io, "`\$")
             print(out, s)
             
             mark(io)

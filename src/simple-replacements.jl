@@ -1,4 +1,4 @@
-export replace_sections
+export replace_lines
 
 """
     replace_lines(path::AbstractString)
@@ -13,27 +13,27 @@ replace_lines(path::AbstractString) = replace_lines(Path(path))
 
 function replace_lines(file::File)
     lines = readlines(file.path)
-    rlines = map(lines) do line
-        if startswidth(line, '#') && !endswidth(line, '#')
-           replace(line, '#' => '=') 
-        elseif startswidth(line, "* ")
-            replace(line, "* ", "- ")
-        elseif startswidth(line, "![")
-            m = match(r"!\[(.+)\]\((.+)\)", line)
-            caption, imgpath = m.captures
-            img = basename(imgpath)
-            string(".", caption, "\n",
-                   "image::../../images/basics/", 
-                   img, 
-                   "[align="center"]")
-        else            
-            line
-        end
-    end
+    
     open(file.path, "w") do io
-        for line in rlines
-            println(io, line)
-        end
+       for line in lines
+           if startswith(line, '#') && !endswith(line, '#')
+              println(io, replace(line, '#' => '=')) 
+           elseif startswith(line, "* ")
+               println(io, "- ", line[3:end])
+           elseif startswith(line, "![")
+               m = match(r"!\[(.*)\]\((.+)\)", line)
+               caption, imgpath = m.captures
+               img = basename(imgpath)
+               if !isempty(caption)
+                   println(io, ".", caption)
+               end
+               println(io, "image::../../images/basics/", 
+                      img, 
+                      "[align=\"center\"]")
+           else            
+               println(io, line)
+           end           
+       end 
     end
 end
 
