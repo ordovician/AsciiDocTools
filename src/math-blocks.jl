@@ -43,4 +43,4 @@ function replace_math(file::File)
     end    
 end
 
-replace_math(dir::Dir) = replace_item(dir, replace_math)
+replace_math(dir::Dir) = visitdir(replace_math, dir.path)

@@ -59,4 +59,4 @@ function replace_blurbs(file::File)
     end
 end
 
-replace_blurbs(dir::Dir) = replace_item(dir, replace_blurbs)
+replace_blurbs(dir::Dir) = visitdir(replace_blurbs, dir.path)

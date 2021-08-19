@@ -1,4 +1,5 @@
 export Path
+export visitdir
 
 abstract type Path end
 
@@ -22,13 +23,14 @@ function Path(s::AbstractString)
     end
 end
 
-function replace_item(dir::Dir, replacer::Function)
-    cd(dir.path) do
-        entries = filter(readdir()) do entry
-           isdir(entry) || endswith(entry, ".md")
-        end
-        for entry in entries
-            replacer(entry)
+function visitdir(fn::Function, dir::AbstractString)
+    cd(dir) do
+        for entry in readdir()
+            if isdir(entry)
+                visitdir(fn, entry)
+            elseif endswith(entry, ".md")
+                fn(entry)
+            end
         end
     end
 end

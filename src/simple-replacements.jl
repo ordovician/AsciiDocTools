@@ -1,4 +1,5 @@
 export replace_lines
+export imagepaths
 
 """
     replace_lines(path::AbstractString)
@@ -37,4 +38,28 @@ function replace_lines(file::File)
     end
 end
 
-replace_lines(dir::Dir) = replace_item(dir, replace_lines)
+replace_lines(dir::Dir) = visitdir(replace_lines, dir.path)
+
+
+"""
+    imagepaths(path::AbstractString)
+    imagepaths(file::File)
+    imagepaths(dir::Dir)
+    
+List the image assets found in given markdown `file` or all markdown files in
+directory `dir`.
+"""
+imagepaths(path::AbstractString, dest=homedir()) = imagepaths(Path(path), dest)
+
+function imagepaths(file::File, dest=homedir())
+    lines = readlines(file.path)
+    for line in lines
+        if  startswith(line, "![")
+            m = match(r"!\[(.*)\]\((.+)\)", line)
+            caption, imgpath = m.captures
+            println("cp ../", imgpath, " ", dest)            
+        end
+    end   
+end
+
+imagepaths(dir::Dir) = visitdir(imagepaths, dir.path)

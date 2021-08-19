@@ -17,4 +17,4 @@ function replace_all(file::File)
     replace_footnotes(file)    
 end
 
-replace_all(dir::Dir) = replace_item(dir, replace_all)
+replace_all(dir::Dir) = visitdir(replace_all, dir.path)

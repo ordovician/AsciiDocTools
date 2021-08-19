@@ -51,4 +51,4 @@ function replace_codeblocks(file::File)
     end    
 end
 
-replace_codeblocks(dir::Dir) = replace_item(dir, replace_codeblocks)
+replace_codeblocks(dir::Dir) = visitdir(replace_codeblocks, dir.path)

@@ -36,4 +36,4 @@ function replace_footnotes(file::File)
     end 
 end
 
-replace_footnotes(dir::Dir) = replace_item(dir, replace_footnotes)
+replace_footnotes(dir::Dir) = visitdir(replace_footnotes, dir.path)
