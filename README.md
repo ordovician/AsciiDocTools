@@ -11,3 +11,13 @@ Here is an example of how Asciidoc is typically generated on the commandline:
 To install and configure AsciiDoc look at this article: [AsciiDoc and Ruby on macOS](https://erik-engheim.medium.com/asciidoc-and-ruby-on-macos-2bad91088ea3)
 
 The implementation here is in large parts derived from my MarkuaTools and PandocTools Julia packages.
+
+## Quick Guide
+Each file contains a function replace one logical group of items. All these are combined in the `combine.jl` file where you will find the `replace_all` function which replaces everything in a file.
+
+    julia> replace_all("filename.md")
+    
+If you only want to replace e.g. blurbs, you would write:
+
+    julia> replace_blurbs("filename.md")
+    

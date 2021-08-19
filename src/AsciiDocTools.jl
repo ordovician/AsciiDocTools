@@ -7,5 +7,6 @@ include("simple-replacements.jl")
 include("math-blocks.jl")
 include("blurbs.jl")
 include("footnotes.jl")
+include("combined.jl")
 
 end
