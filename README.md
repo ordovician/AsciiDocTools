@@ -21,3 +21,10 @@ If you only want to replace e.g. blurbs, you would write:
 
     julia> replace_blurbs("filename.md")
     
+For your .md files you will usually  have some image assets which you want to move over to your new project.
+
+    julia> imagepaths(".", "~/NewProj/Images")
+    cp ../assets/textmate-bundle.jpg ~/NewProj/Images
+    cp ../assets/boxing-unboxing.svg ~/NewProj/Images
+    
+Then you can copy paste these copy commands to move the files.
