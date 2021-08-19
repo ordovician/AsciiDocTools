@@ -1,11 +1,12 @@
 export replace_math
 
 """
-    relace_inlinemath(path::AbstractString)
-    relace_inlinemath(file::File)
-    relace_inlinemath(dir::Dir)
+    replace_math(path::AbstractString)
+    replace_math(file::File)
+    replace_math(dir::Dir)
     
-Replace markdown inline math such as `\$x = 10\$` with Markua equivalent.
+Replace markdown inline math such as `\$x = 10\$` with Markua equivalent,
+as well as math blocks with double dollar sign.
 """
 replace_math(path::AbstractString) = replace_math(Path(path))
 
