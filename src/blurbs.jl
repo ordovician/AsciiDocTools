@@ -42,8 +42,7 @@ function replace_blurbs(file::File)
                 # skip next line if it is empty
                 # Pandoc blurb needs empty line to look like header
                 if isempty(lstrip(in("> "), lines[i+1]))
-                    println("SKIPPED: ", lines[i+1])
-                   i += 1 
+                    i += 1 
                 end
             elseif state == FindEnd && !startswith(line, '>')
                 state = FindStart
