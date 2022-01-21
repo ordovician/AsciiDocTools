@@ -14,6 +14,7 @@ function replace_all(file::File)
     replace_blurbs(file)
     replace_math(file)
     replace_codeblocks(file)
+    replace_replblocks(file)
     replace_footnotes(file)    
 end
 
