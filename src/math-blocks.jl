@@ -2,38 +2,109 @@ export replace_math
 export findstemblocks
 export Equation
 export savelatexfiles
+export replace_equations_with_images
+export renamefiles
 
 using LatexSVG, Printf
 
-struct Equation
-   text::String
-   lineno::Int
-   index::Int 
+"""
+    replace_equations_with_images(filepath::AbstractString)
+Find directory associated with `filepath` and find images of an filename
+mappings there
+"""
+function replace_equations_with_images(filepath::AbstractString)
+    subdir, _ = splitext(filepath)
+    mappingfile = joinpath(subdir, "mapping.txt")
+    filenames = map(filter(!isempty, readlines(mappingfile))) do line
+        oldname, newname = split(line)
+        (;oldname, newname)
+    end
+    
+    eqs = findstemblocks(filepath)
+    
+    lines = readlines(filepath)
+    open(filepath, "w") do io
+        i = 1
+        for (eq, mapping) in zip(eqs, filenames)
+            j, k = first(eq), last(eq)
+            
+            map(lines[i:j-1]) do line
+                println(io, line)
+            end
+            i = k + 1
+            path = joinpath(subdir, mapping.newname)
+            println(io, "image::$path[align=\"center\"]")
+            map(lines[j:k]) do line
+                println(io, "// ", line)
+            end 
+        end
+        map(lines[i:end]) do line
+            println(io, line)
+        end
+    end
+    nothing
 end
 
 """
-    savelatexfiles(filepath, equations)
+    renamefiles(mappingfile::AbstractString
+Rename files in current directory according the mapping file.
+
+# Mapping file example
+
+    01-0071.svg trigfuncs.svg
+    02-0082.svg sinedef.svg
+
+This will rename `01-0071.svg` to `trigfuncs.svg` and so on.
+"""
+function renamefiles(mappingfile::AbstractString)
+    lines = filter(!isempty, readlines(mappingfile))
+    for line in  lines
+        oldname, newname = split(line)
+        if !isfile(oldname)
+            error("Cannot rename '$oldname' to '$newname' because file could not be found in current directory")
+        end
+        mv(oldname, newname)
+    end
+end
+
+"""
+    savelatexfiles(filepath, equations::AbstractArray{<:AbstractString})
 Use output from `findstemblocks` to create latex svg files in subdir with
 same name as file in `filepath`.
 """
-function savelatexfiles(filepath::AbstractString, equations::AbstractArray{Equation})
+function savelatexfiles(filepath::AbstractString, equations::AbstractArray{<:AbstractString})
+    lines = readlines(filepath)
     dir = dirname(filepath)
     subdir, _ = splitext(basename(filepath))
     dstpath = mkpath(joinpath(dir, subdir))
     filesnames = String[]
     cd(dstpath) do
-        for eq in equations
-            svg = latexsvg(raw"$$" * eq.text * raw"$$")
-            filename = @sprintf("%02d-%04d.svg", eq.index, eq.lineno)
-            push!(filesnames, filename)
-            savesvg(filename, svg)
+        for (i, eq) in enumerate(equations)
+            svg = latexsvg(raw"$$" * eq * raw"$$")
+            file = string(i, ".svg")
+            push!(filesnames, file)
+            savesvg(file, svg)
         end
+        
+        # Store name of files made in a mapping file
         open("mapping.txt", "w") do io
            for file in filesnames
                println(io, file)
            end 
         end
     end
+    
+    filesnames
+end
+
+function savelatexfiles(filepath::AbstractString)
+    ranges = findstemblocks(filepath)
+    lines = readlines(filepath)
+    equations = map(ranges) do r
+        i, j = first(r), last(r)
+        join(lines[i+2:j-1], "\n")
+    end
+    savelatexfiles(filepath, equations)
 end
 
 """
@@ -53,17 +124,17 @@ function findstemblocks(filepath::AbstractString)
                startswith(line, "++++")
            end
     
-    equations = Equation[]
+    equations = UnitRange[]
     i = 1
     j = 0
     while i <= length(rows) - 2
        if startswith(lines[rows[i]], "[stem]") &&
           startswith(lines[rows[i+1]], "++++") &&
           startswith(lines[rows[i+2]], "++++")
-          str = join(lines[rows[i+1]+1:rows[i+2]-1], "\n")
+          # str = join(lines[rows[i+1]+1:rows[i+2]-1], "\n")
           j += 1
-          equation = Equation(str, rows[i], j)
-          push!(equations, equation)
+          # equation = Equation(str, rows[i], j)
+          push!(equations, rows[i]:rows[i+2])
           i += 3
        else
           i += 1
