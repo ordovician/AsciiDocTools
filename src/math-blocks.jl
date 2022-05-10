@@ -16,8 +16,8 @@ function replace_equations_with_images(filepath::AbstractString)
     subdir, _ = splitext(filepath)
     mappingfile = joinpath(subdir, "mapping.txt")
     filenames = map(filter(!isempty, readlines(mappingfile))) do line
-        oldname, newname = split(line)
-        (;oldname, newname)
+        _, newname = split(line)
+        newname
     end
     
     eqs = findstemblocks(filepath)
@@ -25,14 +25,14 @@ function replace_equations_with_images(filepath::AbstractString)
     lines = readlines(filepath)
     open(filepath, "w") do io
         i = 1
-        for (eq, mapping) in zip(eqs, filenames)
+        for (eq, filename) in zip(eqs, filenames)
             j, k = first(eq), last(eq)
             
             map(lines[i:j-1]) do line
                 println(io, line)
             end
             i = k + 1
-            path = joinpath(subdir, mapping.newname)
+            path = joinpath(subdir, filename)
             println(io, "image::$path[align=\"center\"]")
             map(lines[j:k]) do line
                 println(io, "// ", line)
